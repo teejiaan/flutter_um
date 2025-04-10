@@ -16,30 +16,37 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    if (email == 'test@example.com' && password == 'password123') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
-      );
+    if (email == '' && password == '') {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+      Navigator.pushReplacementNamed(
+        context,
+        '/shop',
+      ); // Navigate to the shop screen
     } else {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Account Not Found'),
-          content: const Text('No account found for this email. Would you like to register?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Account Not Found'),
+              content: const Text(
+                'No account found for this email. Would you like to register?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/screen2');
+                  },
+                  child: const Text('Register'),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/screen2');
-              },
-              child: const Text('Register'),
-            ),
-          ],
-        ),
       );
     }
   }
@@ -47,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return LoginRegisterTemplate(
-      title: 'Welcome Back!',
+      title: 'Login to Your Account',
       submitLabel: 'Login',
       onSubmit: handleLogin,
       fields: [
