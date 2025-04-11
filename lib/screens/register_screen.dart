@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/login_register_template.dart';
+import '../services/firebase_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -9,15 +10,23 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final usernameController = TextEditingController();
+  final firebaseService = FirebaseService();
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final dobController = TextEditingController();
 
-  void handleRegister() {
-    final password = passwordController.text;
-    final confirmPassword = confirmPasswordController.text;
+  void handleRegister() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
 
     if (password != confirmPassword) {
       ScaffoldMessenger.of(
@@ -26,11 +35,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Handle successful registration logic here
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Registered successfully!')));
-    Navigator.pop(context); // Optionally go back to login
+    try {
+      await firebaseService.register(email, password);
+
+      // Registration successful
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Registration successful!')));
+
+      Navigator.pushReplacementNamed(context, '/screen1'); // Go back to login
+    } catch (e) {
+      // Show error
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+    }
   }
 
   @override
@@ -40,17 +59,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       submitLabel: 'Register',
       onSubmit: handleRegister,
       fields: [
-        TextField(
-          controller: usernameController,
-          decoration: const InputDecoration(
-            labelText: 'Username',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-            ),
-            prefixIcon: Icon(Icons.person),
-          ),
-        ),
-        const SizedBox(height: 16),
         TextField(
           controller: emailController,
           keyboardType: TextInputType.emailAddress,
@@ -87,28 +95,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        TextField(
-          controller: dobController,
-          readOnly: true, //Prevent keyboard from showing
-          decoration: const InputDecoration(
-            labelText: 'Date of Birth',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-            ),
-            prefixIcon: Icon(Icons.cake),
-          ),
-          onTap: () async {
-            DateTime? selectedDate = await showDatePicker(
-              context: context,
-              initialDate: DateTime.now(),
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now(),
-            );
-            if (selectedDate != null) {
-              dobController.text =
-                  "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
-            }
-          },
+        Text(
+          'By creating an account, you agree to our Terms of Service and Privacy Policy.',
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
         ),
       ],
     );

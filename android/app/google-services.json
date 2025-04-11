@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "224449223619",
+    "project_id": "umhackathon-632d1",
+    "storage_bucket": "umhackathon-632d1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224449223619:android:a7538ea690b12be46a3b76",
+        "android_client_info": {
+          "package_name": "com.example.flutter_um"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNaeUdz9ChkiCKf_5quR-8qZy2LPISOsI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

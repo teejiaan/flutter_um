@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/login_register_template.dart';
+import '../services/firebase_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,30 +10,29 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final firebaseService = FirebaseService();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void handleLogin() {
+  void handleLogin() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    if (email == '' && password == '') {
+    try {
+      await firebaseService.signIn(email, password);
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Login successful!')));
-      Navigator.pushReplacementNamed(
-        context,
-        '/main',
-      ); // Navigate to the shop screen
-    } else {
+
+      Navigator.pushReplacementNamed(context, '/main');
+    } catch (e) {
       showDialog(
         context: context,
         builder:
             (context) => AlertDialog(
-              title: const Text('Account Not Found'),
-              content: const Text(
-                'No account found for this email. Would you like to register?',
-              ),
+              title: const Text('Login Failed'),
+              content: Text(e.toString()),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
