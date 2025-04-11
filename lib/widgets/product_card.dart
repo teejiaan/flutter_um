@@ -8,6 +8,7 @@ class ProductCard extends StatelessWidget {
   final int quantity;
   final String selectedSize;
   final List<String> availableSizes;
+  final int stocksleft;
   final void Function(int) onQuantityChanged;
   final void Function(String) onSizeChanged;
   final VoidCallback onBuy;
@@ -21,6 +22,7 @@ class ProductCard extends StatelessWidget {
     required this.quantity,
     required this.selectedSize,
     required this.availableSizes,
+    required this.stocksleft,
     required this.onQuantityChanged,
     required this.onSizeChanged,
     required this.onBuy,
@@ -30,6 +32,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: const Color.fromARGB(255, 255, 255, 255),
+      // ignore: deprecated_member_use
       shadowColor: const Color.fromARGB(255, 165, 159, 159).withOpacity(0.2),
       elevation: 3,
       margin: const EdgeInsets.all(12),
@@ -118,6 +121,12 @@ class ProductCard extends StatelessWidget {
                       foregroundColor: Colors.white,
                     ),
                     child: const Text("Buy"),
+                  ),
+
+                  const SizedBox(height: 8),
+                  Text(
+                    "Stocks left: $stocksleft",
+                    style: const TextStyle(fontSize: 12),
                   ),
                 ],
               ),

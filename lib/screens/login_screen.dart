@@ -22,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ).showSnackBar(const SnackBar(content: Text('Login successful!')));
       Navigator.pushReplacementNamed(
         context,
-        '/shop',
+        '/main',
       ); // Navigate to the shop screen
     } else {
       showDialog(

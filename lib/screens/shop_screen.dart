@@ -29,7 +29,7 @@ class _ShopScreenState extends State<ShopScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(131, 73, 67, 67),
-      appBar: AppBar(title: const Text("Shop")),
+
       body: ListView(
         children: [
           TextLogoRow(
@@ -57,6 +57,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 ),
               );
             },
+            stocksleft: 2318,
           ),
           ProductCard(
             index: 1,
@@ -77,6 +78,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 ),
               );
             },
+            stocksleft: 1239,
           ),
         ],
       ),
