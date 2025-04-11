@@ -17,17 +17,16 @@ class FirebaseService {
 
     // Create a document in Firestore with default values
     await _db.collection('user').doc(uid).set({
-      'userID': email,
+      'email': email,
       'daysCheckedIn': 0,
-      'membership': 'Free',
-      'password': password,
+      'membership': false,
       'points': 0,
     });
   }
 
   // Optional: fetch user data later
   Future<DocumentSnapshot> getUserData(String uid) {
-    return _db.collection('users').doc(uid).get();
+    return _db.collection('user').doc(uid).get();
   }
 
   Future<void> login(String email, String password) async {
