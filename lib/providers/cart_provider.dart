@@ -5,6 +5,26 @@ class CartProvider with ChangeNotifier {
   final List<CartItem> _items = [];
 
   List<CartItem> get items => _items;
+  void updateQuantity(CartItem item, int newQuantity) {
+    final index = _items.indexWhere(
+      (e) => e.name == item.name && e.size == item.size,
+    );
+    if (index != -1) {
+      _items[index] = CartItem(
+        name: item.name,
+        imageUrl: item.imageUrl,
+        price: item.price,
+        quantity: newQuantity,
+        size: item.size,
+      );
+      notifyListeners();
+    }
+  }
+
+  void removeItem(CartItem item) {
+    _items.removeWhere((e) => e.name == item.name && e.size == item.size);
+    notifyListeners();
+  }
 
   void addToCart(CartItem item) {
     // Check if item with same name and size exists, then update quantity
