@@ -1,45 +1,23 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:csv/csv.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
-import 'package:open_file/open_file.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
-  const OrderHistoryScreen({Key? key}) : super(key: key);
+  const OrderHistoryScreen({super.key});
 
   @override
-  _OrderHistoryScreenState createState() => _OrderHistoryScreenState();
+  State<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
-  List<DocumentSnapshot> orders = [];
-  List<List<dynamic>> orderData = [];
-
-  // Load orders from Firestore for the current user
-  Future<void> loadOrderData() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) {
-      return; // No user logged in
-    }
-
-    final orderSnapshots =
-        await FirebaseFirestore.instance
-            .collection('OrderHistory')
-            .where('UserId', isEqualTo: userId)
-            .get();
-
-    setState(() {
-      orders = orderSnapshots.docs;
-    });
-  }
+  List<DocumentSnapshot> orderData = [];
 
   @override
   void initState() {
@@ -47,33 +25,130 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     loadOrderData();
   }
 
+  Future<void> loadOrderData() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    final query =
+        await FirebaseFirestore.instance
+            .collection('OrderHistory')
+            .where('UserId', isEqualTo: userId)
+            .get();
+
+    setState(() {
+      orderData = query.docs;
+    });
+  }
+
+  Future<void> _generateTransactionReport(Map<String, dynamic> order) async {
+    final pdf = pw.Document();
+
+    final productMap = Map<String, dynamic>.from(order['Product'] ?? {});
+    final date = order['Date'] ?? '';
+    final time = order['Time'] ?? '';
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Transaction Receipt',
+                style: pw.TextStyle(
+                  fontSize: 24,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 20),
+              _buildDetailRow('Transaction ID:', order['TransactionID'] ?? ''),
+              _buildDetailRow('User ID:', order['UserId'] ?? ''),
+              _buildDetailRow(
+                'Paid (RM):',
+                (order['Paid(RM)'] ?? 0).toString(),
+              ),
+              _buildDetailRow('Date:', date),
+              _buildDetailRow('Time:', time),
+              _buildDetailRow('Payment Method:', order['PaymentMethod'] ?? ''),
+              _buildDetailRow('Receipt ID:', order['ReceiptID'] ?? ''),
+              _buildDetailRow('Organization:', order['Organization'] ?? ''),
+              pw.SizedBox(height: 20),
+              pw.Text(
+                'Products:',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              ),
+              pw.SizedBox(height: 8),
+              ...productMap.entries.map((e) => pw.Text('${e.key}: ${e.value}')),
+              pw.Spacer(),
+              pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Text(
+                  'Generated on: ${DateFormat('yyyy-MM-dd hh:mm a').format(DateTime.now())}',
+                  style: pw.TextStyle(fontSize: 10, color: PdfColors.grey),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    final output = await getTemporaryDirectory();
+    final file = File(
+      '${output.path}/transaction_${order['TransactionID']}.pdf',
+    );
+    await file.writeAsBytes(await pdf.save());
+    await OpenFile.open(file.path);
+
+    await Share.shareXFiles([
+      XFile(file.path),
+    ], text: 'Transaction Report - ${order['TransactionID']}');
+  }
+
+  pw.Widget _buildDetailRow(String label, String value) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 4),
+      child: pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Container(
+            width: 130,
+            child: pw.Text(
+              label,
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            ),
+          ),
+          pw.Expanded(child: pw.Text(value)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Order History'),
+        backgroundColor: Colors.teal,
+      ),
       body:
-          orders.isEmpty
+          orderData.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
-                itemCount: orders.length,
+                itemCount: orderData.length,
                 itemBuilder: (context, index) {
-                  final order = orders[index].data() as Map<String, dynamic>;
-                  final transactionID = order['TransactionID'];
-                  final paid = order['Amount'];
-                  final date = order['Date'];
-
-                  // 'Product' is a map, so we can iterate over its entries
-                  final Map<String, dynamic> productMap =
-                      Map<String, dynamic>.from(order['Product']);
-                  final productNames =
-                      productMap.keys.toList(); // List of product names
-                  final productQuantities =
-                      productMap.values.toList(); // List of quantities
-
-                  // Example: Accessing the first product's name and quantity
+                  final order = orderData[index].data() as Map<String, dynamic>;
+                  final transactionID = order['TransactionID'] ?? 'N/A';
+                  final paid = (order['Paid(RM)'] ?? 0).toDouble();
+                  final date = order['Date'] ?? '';
+                  final productMap = Map<String, dynamic>.from(
+                    order['Product'] ?? {},
+                  );
                   final firstProduct =
-                      productNames.isNotEmpty ? productNames[0] : 'No Product';
-                  final firstQuantity =
-                      productQuantities.isNotEmpty ? productQuantities[0] : 0;
+                      productMap.entries.isNotEmpty
+                          ? productMap.entries.first
+                          : const MapEntry('No Product', 0);
 
                   return Card(
                     margin: const EdgeInsets.symmetric(
@@ -93,91 +168,23 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Total Paid: RM ${paid != null ? double.parse(paid.toString()).toStringAsFixed(2) : "0.00"}',
-                          ),
-
+                          Text('Product: ${firstProduct.key}'),
+                          Text('Quantity: ${firstProduct.value}'),
+                          Text('Total Paid: RM ${paid.toStringAsFixed(2)}'),
                           Text('Date: $date'),
-                          for (int i = 0; i < productNames.length; i++)
-                            Text('${productNames[i]}: ${productQuantities[i]}'),
                         ],
                       ),
                       trailing: IconButton(
                         icon: const Icon(
                           Icons.picture_as_pdf,
-                          color: Colors.red,
+                          color: Colors.teal,
                         ),
-                        onPressed: () {
-                          generatePDF(order);
-                        },
+                        onPressed: () => _generateTransactionReport(order),
                       ),
                     ),
                   );
                 },
               ),
-    );
-  }
-
-  // Generate a PDF report for the order
-  Future<void> generatePDF(Map<String, dynamic> order) async {
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build:
-            (pw.Context context) => pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                // Title of the receipt
-                pw.Text(
-                  'Receipt',
-                  style: pw.TextStyle(
-                    fontSize: 24,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-                pw.SizedBox(height: 20),
-
-                // Transaction ID, Date, and Paid information
-                pw.Text('Transaction ID: ${order['TransactionID']}'),
-                pw.Text('Date: ${order['Date']}'),
-                pw.Text(
-                  'Paid: RM ${order['Paid'].toStringAsFixed(2)}',
-                ), // Ensure to convert paid to string with fixed decimal
-                pw.SizedBox(height: 20),
-
-                // Header for item list
-                pw.Text(
-                  'Items:',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                ),
-                pw.SizedBox(height: 10),
-
-                // Loop through each product in the 'items' field
-                ...order['Product'].entries.map((entry) {
-                  final productName = entry.key;
-                  final quantity = entry.value;
-                  return pw.Row(
-                    children: [
-                      pw.Expanded(child: pw.Text(productName)),
-                      pw.Text(
-                        'x$quantity',
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                      ),
-                    ],
-                  );
-                }).toList(),
-
-                pw.SizedBox(height: 20),
-
-                // Total paid at the bottom
-                pw.Text(
-                  'Total Paid: RM ${order['Paid'].toStringAsFixed(2)}',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                ),
-              ],
-            ),
-      ),
     );
   }
 }

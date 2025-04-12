@@ -1,6 +1,13 @@
 # flutter_um
 
-A new Flutter project.
+UM Hackathon 2025 Project. 
+Domain 1 (Enhancing Charity)
+Group name = We_Ball
+
+Our Slides link is below:
+
+https://www.canva.com/design/DAGkWgAlFek/s-fPzgqGiZLA4WVn7JlMnQ/edit?utm_content=DAGkWgAlFek&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
 
 ## Getting Started
 
