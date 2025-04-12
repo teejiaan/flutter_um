@@ -39,13 +39,21 @@ class _ShopScreenState extends State<ShopScreen> {
         child: Column(
           children: [
             // ⬅️ Add your message widget here
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: TextLogoRow(
-                amount: 'RM 4823',
-                sponsor: 'Yayasan Kebajikan Negara (YKN)',
-                sponsorLogoAsset: 'assets/bank_islam_logo.png',
-              ),
+            FutureBuilder<double>(
+              future: _firebaseService.calculateMonthlyDonation(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return const CircularProgressIndicator();
+
+                final donationAmount = snapshot.data!;
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TextLogoRow(
+                    amount: 'RM ${donationAmount.toStringAsFixed(2)}',
+                    sponsor: 'Yayasan Kebajikan Negara (YKN)',
+                    sponsorLogoAsset: 'assets/bank_islam_logo.png',
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 12),

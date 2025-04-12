@@ -45,8 +45,12 @@ class _MainScreenState extends State<MainScreen> {
             DrawerHeader(
               decoration: BoxDecoration(color: Colors.teal),
               child: const Text(
-                'Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+                '🏠︎ Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             ListTile(
@@ -54,6 +58,41 @@ class _MainScreenState extends State<MainScreen> {
               title: const Text('Settings'),
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.card_giftcard),
+              title: const Text('Collect Points'),
+              onTap: () {
+                Navigator.pop(context);
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(25.0),
+                    ),
+                  ),
+                  builder: (context) {
+                    return Container(
+                      padding: const EdgeInsets.all(24),
+                      height: 150,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            '🎉 +75 Points Collected',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Text('Come back tomorrow to earn more points!'),
+                        ],
+                      ),
+                    );
+                  },
+                );
               },
             ),
           ],

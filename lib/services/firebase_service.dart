@@ -123,4 +123,37 @@ class FirebaseService {
   Stream<QuerySnapshot> getProducts() {
     return _db.collection('items').snapshots();
   }
+
+  Future<double> calculateMonthlyDonation() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('OrderHistory').get();
+    double totalAmount = 0.0;
+
+    for (var doc in snapshot.docs) {
+      final amount = doc['Amount'];
+      if (amount is int) {
+        totalAmount += amount.toDouble();
+      } else if (amount is double) {
+        totalAmount += amount;
+      }
+    }
+
+    return totalAmount * 0.7; // Return 70%
+  }
+
+  Future<void> updateUserPoints(String uid, int points) async {
+    await _db.collection('user').doc(uid).update({
+      'points': FieldValue.increment(points),
+    });
+  }
+
+  Future<void> updateUserMembership(String uid, bool membership) async {
+    await _db.collection('user').doc(uid).update({'membership': membership});
+  }
+
+  Future<void> updateUserDaysCheckedIn(String uid, int daysCheckedIn) async {
+    await _db.collection('user').doc(uid).update({
+      'daysCheckedIn': daysCheckedIn,
+    });
+  }
 }
