@@ -37,6 +37,8 @@ class FirebaseService {
     await _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
+  // Shop screen product view
+
   // User Data
   Future<void> saveUserInfo(String uid, Map<String, dynamic> data) {
     return _db.collection('user').doc(uid).set(data, SetOptions(merge: true));
@@ -54,7 +56,7 @@ class FirebaseService {
 
   // Products
   Future<void> purchaseProduct(String productId, int quantity) async {
-    final ref = _db.collection('products').doc(productId);
+    final ref = _db.collection('items').doc(productId);
     await _db.runTransaction((transaction) async {
       final snapshot = await transaction.get(ref);
       final stock = snapshot['stock'];
@@ -66,7 +68,11 @@ class FirebaseService {
     });
   }
 
+  Stream<QuerySnapshot> getItems() {
+    return FirebaseFirestore.instance.collection('items').snapshots();
+  }
+
   Stream<QuerySnapshot> getProducts() {
-    return _db.collection('products').snapshots();
+    return _db.collection('items').snapshots();
   }
 }
