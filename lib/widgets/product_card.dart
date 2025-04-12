@@ -120,7 +120,7 @@ class ProductCard extends StatelessWidget {
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text("Buy"),
+                    child: const Text("Add to Cart"),
                   ),
 
                   const SizedBox(height: 8),

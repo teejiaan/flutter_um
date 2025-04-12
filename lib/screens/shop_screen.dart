@@ -3,6 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firebase_service.dart';
 import '../widgets/product_card.dart';
 import '../widgets/text_logo_row.dart';
+import '../models/cart_item.dart';
+import 'cart_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/cart_provider.dart';
 
 class ShopScreen extends StatefulWidget {
   const ShopScreen({Key? key}) : super(key: key);
@@ -102,7 +106,22 @@ class _ShopScreenState extends State<ShopScreen> {
                           (change) => updateQuantity(index, change),
                       onSizeChanged: (size) => updateSize(index, size),
                       onBuy: () {
-                        // handle buy logic
+                        final cartItem = CartItem(
+                          name: name,
+                          imageUrl: imageUrl,
+                          price: price,
+                          quantity: quantities[index],
+                          size: selectedSizes[index],
+                        );
+
+                        Provider.of<CartProvider>(
+                          context,
+                          listen: false,
+                        ).addToCart(cartItem);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Item added to cart")),
+                        );
                       },
                       stocksleft: stock,
                     );
