@@ -156,4 +156,13 @@ class FirebaseService {
       'daysCheckedIn': daysCheckedIn,
     });
   }
+
+  Future<void> updateMembershipStatus() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('user').doc(user.uid).update({
+        'membership': true,
+      });
+    }
+  }
 }

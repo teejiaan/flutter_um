@@ -5,6 +5,8 @@ import 'package:flutter_um/services/firebase_service.dart';
 import 'package:flutter_um/services/order_csv_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
+import '../models/cart_item.dart';
+import 'package:flutter_um/models/cart_item.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -12,6 +14,7 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
+    final firebaseService = FirebaseService();
 
     double totalPrice = cart.items.fold(
       0.0,
@@ -149,7 +152,7 @@ class CartScreen extends StatelessWidget {
                 );
 
                 if (confirm == true) {
-                  final firebaseService = FirebaseService();
+                  bool hasValidItems = false;
 
                   for (var item in cart.items) {
                     final querySnapshot =
@@ -161,27 +164,38 @@ class CartScreen extends StatelessWidget {
                     if (querySnapshot.docs.isNotEmpty) {
                       final doc = querySnapshot.docs.first;
                       final stock = doc['stock'];
+
                       if (stock >= item.quantity) {
+                        hasValidItems = true;
                         await firebaseService.purchaseProduct(
                           doc.id,
                           item.quantity,
                         );
-
-                        await firebaseService.addOrder(
-                          userId: userId,
-                          paid: cart.totalAmount,
-                          items: cart.items,
-                          organization: 'Yayasan Kebajikan Negara (YKN)',
-                          paymentMethod: 'Online',
-                        );
                       }
+                    } else if (item.name == 'Membership') {
+                      hasValidItems = true;
+                      // Update membership status here if needed
+                      await FirebaseFirestore.instance
+                          .collection('user')
+                          .doc(userId)
+                          .update({'membership': true});
                     }
                   }
 
-                  cart.clearCart();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Purchase successful!")),
-                  );
+                  if (hasValidItems) {
+                    await firebaseService.addOrder(
+                      userId: userId,
+                      paid: cart.totalAmount,
+                      items: cart.items,
+                      organization: 'Yayasan Kebajikan Negara (YKN)',
+                      paymentMethod: 'Online',
+                    );
+
+                    cart.clearCart();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Purchase successful!")),
+                    );
+                  }
                 }
               },
               style: ElevatedButton.styleFrom(

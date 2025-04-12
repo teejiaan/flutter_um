@@ -33,6 +33,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         await FirebaseFirestore.instance
             .collection('OrderHistory')
             .where('UserId', isEqualTo: userId)
+            // .orderBy(['Date'], descending: true)
             .get();
 
     setState(() {

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_um/screens/cart_screen.dart';
 import 'package:flutter_um/screens/order_history_screen.dart';
 import 'package:flutter_um/screens/shop_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_um/screens/analytics_screen.dart';
+import 'package:flutter_um/screens/purchase_membership_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -95,9 +98,47 @@ class _MainScreenState extends State<MainScreen> {
                 );
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.analytics),
+              title: const Text('View Analytics'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AnalyticsScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.card_membership),
+              title: const Text('Purchase Membership'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PurchaseMembershipScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Text('🚪', style: TextStyle(fontSize: 20)),
+              title: const Text('Log Out', style: TextStyle(color: Colors.red)),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/screen1',
+                ); // Redirect to login
+              },
+            ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
+
       body: _screens[_currentIndex],
       bottomNavigationBar: Stack(
         children: [
