@@ -2,11 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_um/services/firebase_service.dart';
-import 'package:flutter_um/services/order_csv_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
-import '../models/cart_item.dart';
-import 'package:flutter_um/models/cart_item.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -183,12 +180,20 @@ class CartScreen extends StatelessWidget {
                   }
 
                   if (hasValidItems) {
+                    final userDoc =
+                        await FirebaseFirestore.instance
+                            .collection('user')
+                            .doc(userId)
+                            .get();
+                    final membership = userDoc.data()?['membership'] ?? false;
+
                     await firebaseService.addOrder(
                       userId: userId,
                       paid: cart.totalAmount,
                       items: cart.items,
                       organization: 'Yayasan Kebajikan Negara (YKN)',
                       paymentMethod: 'Online',
+                      membership: membership,
                     );
 
                     cart.clearCart();

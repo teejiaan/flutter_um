@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class AnalyticsScreen extends StatelessWidget {
-   AnalyticsScreen({super.key});
+  AnalyticsScreen({super.key});
 
   final double totalAmount = 2150.0; // Mock total purchase amount
 
@@ -43,7 +43,7 @@ class AnalyticsScreen extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              'Total Purchase Amount: RM ${totalAmount.toStringAsFixed(2)}',
+              'Total Donated Amount: RM ${totalAmount.toStringAsFixed(2)}',
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),

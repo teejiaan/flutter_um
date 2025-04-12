@@ -48,9 +48,11 @@ class _ShopScreenState extends State<ShopScreen> {
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: TextLogoRow(
+                    Charity: 'Yayasan Kebajikan Negara',
+                    CharityLogoAsset: 'assets/yayasan.png',
                     amount: 'RM ${donationAmount.toStringAsFixed(2)}',
-                    sponsor: 'Yayasan Kebajikan Negara (YKN)',
-                    sponsorLogoAsset: 'assets/bank_islam_logo.png',
+                    sponsor: 'Axiata Group',
+                    sponsorLogoAsset: 'assets/Axiata_Logo.png',
                   ),
                 );
               },

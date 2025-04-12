@@ -14,17 +14,12 @@ class HomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Centered Image
-              Image.asset(
-                'assets/bank_islam_logo.png',
-                width: 300,
-                height: 300,
-              ),
+              Image.asset('assets/home_logo.png', width: 300, height: 300),
               const SizedBox(height: 50),
 
               // Custom Buttons with small graphics
               CustomButton(
                 label: 'Login',
-                imagePath: 'assets/orange_back.jpeg',
                 onPressed: () => Navigator.pushNamed(context, '/screen1'),
               ),
               // const SizedBox(height: 16),

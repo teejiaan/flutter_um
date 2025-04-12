@@ -122,6 +122,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   Future<void> generatePDF(Map<String, dynamic> order) async {
     final pdf = pw.Document();
 
+    // Safely cast Amount to double
+    final double paidAmount = (order['Amount'] as num).toDouble();
+
     pdf.addPage(
       pw.Page(
         build:
@@ -138,7 +141,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 pw.SizedBox(height: 20),
                 pw.Text('Transaction ID: ${order['TransactionID']}'),
                 pw.Text('Date: ${order['Date']}'),
-                pw.Text('Paid: RM ${order['Amount'].toStringAsFixed(2)}'),
+                pw.Text('Paid: RM ${paidAmount.toStringAsFixed(2)}'),
                 pw.SizedBox(height: 20),
                 pw.Text(
                   'Items:',
@@ -160,7 +163,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 }).toList(),
                 pw.SizedBox(height: 20),
                 pw.Text(
-                  'Total Paid: RM ${order['Amount'].toStringAsFixed(2)}',
+                  'Total Paid: RM ${paidAmount.toStringAsFixed(2)}',
                   style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                 ),
               ],
@@ -175,6 +178,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
     await file.writeAsBytes(await pdf.save());
 
+    // Optional: open the file
+    await OpenFile.open(file.path);
     print("PDF saved to: ${file.path}");
   }
 }

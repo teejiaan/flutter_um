@@ -63,6 +63,7 @@ class FirebaseService {
     required List<dynamic> items,
     required String organization,
     required String paymentMethod,
+    required bool membership,
   }) async {
     Map<String, int> productMap = {
       for (var item in items) item.name: item.quantity,
@@ -80,20 +81,24 @@ class FirebaseService {
       await _db.collection('OrderHistory').add({
         'TransactionID': transactionId,
         'UserId': userId,
-        'Product': productMap, // ✅ Product names with quantities
+        'Product': productMap,
         'Amount': items.fold<double>(
           0.0,
           (sum, item) => sum + (item.price * item.quantity),
         ), // Calculate total amount
         'Organisation': organization,
         'Paid(RM)': paid,
-        'PointsAdded': (paid / 10).round(), // Example logic to calculate points
-        'Time': formattedTime,
+        'PointsAdded':
+            membership
+                ? (paid / 5)
+                    .round() // Example logic to calculate points for members
+                : (paid / 10)
+                    .round(), // Example logic to calculate points for non-members
+        'Time': formattedTime, // Example logic to calculate points
         'Date': formattedDate,
         'PaymentMethod': paymentMethod,
         'ReceiptID':
             'Receipt_${transactionId}', // Example, could be more sophisticated
-        'Donated': false, // Assuming donation hasn't been completed by default
       });
 
       print('Order added successfully');

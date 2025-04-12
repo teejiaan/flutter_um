@@ -5,6 +5,7 @@ import 'package:flutter_um/screens/shop_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_um/screens/analytics_screen.dart';
 import 'package:flutter_um/screens/purchase_membership_screen.dart';
+import 'package:flutter_um/screens/daily_points_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -64,40 +65,17 @@ class _MainScreenState extends State<MainScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.card_giftcard),
-              title: const Text('Collect Points'),
+              leading: const Icon(Icons.star),
+              title: const Text('Daily Points'),
               onTap: () {
                 Navigator.pop(context);
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(25.0),
-                    ),
-                  ),
-                  builder: (context) {
-                    return Container(
-                      padding: const EdgeInsets.all(24),
-                      height: 150,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            '🎉 +75 Points Collected',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          Text('Come back tomorrow to earn more points!'),
-                        ],
-                      ),
-                    );
-                  },
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DailyPointsScreen()),
                 );
               },
             ),
+
             ListTile(
               leading: const Icon(Icons.analytics),
               title: const Text('View Analytics'),

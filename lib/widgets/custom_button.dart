@@ -2,15 +2,9 @@ import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
   final String label;
-  final String imagePath;
   final VoidCallback onPressed;
 
-  const CustomButton({
-    super.key,
-    required this.label,
-    required this.imagePath,
-    required this.onPressed,
-  });
+  const CustomButton({super.key, required this.label, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +18,6 @@ class CustomButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(imagePath, width: 24, height: 24),
           const SizedBox(width: 10),
           Text(
             label,
