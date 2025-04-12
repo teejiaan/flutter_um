@@ -4,7 +4,6 @@ import '../services/firebase_service.dart';
 import '../widgets/product_card.dart';
 import '../widgets/text_logo_row.dart';
 import '../models/cart_item.dart';
-import 'cart_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 
@@ -107,6 +106,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       onSizeChanged: (size) => updateSize(index, size),
                       onBuy: () {
                         final cartItem = CartItem(
+                          id: item.id,
                           name: name,
                           imageUrl: imageUrl,
                           price: price,

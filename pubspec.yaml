@@ -17,6 +17,14 @@ dependencies:
   cloud_firestore: ^5.6.6
   firebase_auth: ^5.5.2
   provider: ^6.1.1
+  csv: ^6.0.0
+  pdf: ^3.11.3
+  path_provider: ^2.1.5
+  open_file: ^3.5.10
+  uuid: ^4.5.1
+  intl: ^0.20.2
+  fl_chart: ^0.70.2
+  share_plus: ^10.1.4
 
 dev_dependencies:
   flutter_test:
@@ -31,6 +39,7 @@ flutter:
     - assets/orange_back.jpeg
     - assets/Graphic-T-Shirt-PNG.png
     - assets/Sneakers.png
+    - assets/OrderHistory.csv
   
   
   

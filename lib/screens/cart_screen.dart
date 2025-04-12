@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_um/services/firebase_service.dart';
+import 'package:flutter_um/services/order_csv_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 
@@ -114,6 +116,17 @@ class CartScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: ElevatedButton(
               onPressed: () async {
+                final userId = FirebaseAuth.instance.currentUser?.uid;
+
+                if (userId == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("You must be logged in to checkout"),
+                    ),
+                  );
+                  return;
+                }
+
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder:
@@ -137,6 +150,7 @@ class CartScreen extends StatelessWidget {
 
                 if (confirm == true) {
                   final firebaseService = FirebaseService();
+
                   for (var item in cart.items) {
                     final querySnapshot =
                         await FirebaseFirestore.instance
@@ -151,6 +165,14 @@ class CartScreen extends StatelessWidget {
                         await firebaseService.purchaseProduct(
                           doc.id,
                           item.quantity,
+                        );
+
+                        await firebaseService.addOrder(
+                          userId: userId,
+                          paid: cart.totalAmount,
+                          items: cart.items,
+                          organization: 'Yayasan Kebajikan Negara (YKN)',
+                          paymentMethod: 'Online',
                         );
                       }
                     }

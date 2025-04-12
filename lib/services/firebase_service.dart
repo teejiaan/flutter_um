@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_um/models/cart_item.dart';
+import 'package:intl/intl.dart';
 
 class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -52,6 +54,52 @@ class FirebaseService {
         .collection('cart')
         .doc(productId)
         .set({'quantity': qty});
+  }
+
+  // Method to add an order to the OrderHistory collection
+  Future<void> addOrder({
+    required String userId,
+    required double paid,
+    required List<dynamic> items,
+    required String organization,
+    required String paymentMethod,
+  }) async {
+    Map<String, int> productMap = {
+      for (var item in items) item.name: item.quantity,
+    };
+
+    try {
+      // Generate a unique TransactionID (could use a timestamp or UUID)
+      String transactionId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      // Get the current date and time
+      String formattedTime = DateFormat('HH:mm:ss').format(DateTime.now());
+      String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+      // Add order to the Firestore OrderHistory collection
+      await _db.collection('OrderHistory').add({
+        'TransactionID': transactionId,
+        'UserId': userId,
+        'Product': productMap, // ✅ Product names with quantities
+        'Amount': items.fold<double>(
+          0.0,
+          (sum, item) => sum + (item.price * item.quantity),
+        ), // Calculate total amount
+        'Organisation': organization,
+        'Paid(RM)': paid,
+        'PointsAdded': (paid / 10).round(), // Example logic to calculate points
+        'Time': formattedTime,
+        'Date': formattedDate,
+        'PaymentMethod': paymentMethod,
+        'ReceiptID':
+            'Receipt_${transactionId}', // Example, could be more sophisticated
+        'Donated': false, // Assuming donation hasn't been completed by default
+      });
+
+      print('Order added successfully');
+    } catch (e) {
+      print('Error adding order: $e');
+    }
   }
 
   // Products

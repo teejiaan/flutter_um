@@ -11,6 +11,7 @@ class CartProvider with ChangeNotifier {
     );
     if (index != -1) {
       _items[index] = CartItem(
+        id: _items[index].id,
         name: item.name,
         imageUrl: item.imageUrl,
         price: item.price,
@@ -34,6 +35,7 @@ class CartProvider with ChangeNotifier {
 
     if (index != -1) {
       _items[index] = CartItem(
+        id: _items[index].id,
         name: _items[index].name,
         imageUrl: _items[index].imageUrl,
         price: _items[index].price,
@@ -45,6 +47,10 @@ class CartProvider with ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  double get totalAmount {
+    return items.fold(0, (sum, item) => sum + (item.price * item.quantity));
   }
 
   void clearCart() {
