@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_um/services/firebase_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -117,7 +119,6 @@ class CartScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () async {
                 final userId = FirebaseAuth.instance.currentUser?.uid;
-
                 if (userId == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -149,60 +150,89 @@ class CartScreen extends StatelessWidget {
                 );
 
                 if (confirm == true) {
-                  bool hasValidItems = false;
+                  final clientSecret = await createPaymentIntent(
+                    cart.totalAmount,
+                  );
+                  if (clientSecret == null) return;
 
-                  for (var item in cart.items) {
-                    final querySnapshot =
-                        await FirebaseFirestore.instance
-                            .collection('items')
-                            .where('name', isEqualTo: item.name)
-                            .get();
+                  await Stripe.instance.initPaymentSheet(
+                    paymentSheetParameters: SetupPaymentSheetParameters(
+                      paymentIntentClientSecret: clientSecret,
+                      merchantDisplayName: 'Yayasan Kebajikan Negara',
+                      style: ThemeMode.light,
+                      billingDetails: BillingDetails(
+                        email: FirebaseAuth.instance.currentUser?.email,
+                      ),
+                    ),
+                  );
 
-                    if (querySnapshot.docs.isNotEmpty) {
-                      final doc = querySnapshot.docs.first;
-                      final stock = doc['stock'];
+                  try {
+                    await Stripe.instance.presentPaymentSheet();
 
-                      if (stock >= item.quantity) {
+                    // 👇 Only after successful payment
+                    final firebaseService = FirebaseService();
+                    bool hasValidItems = false;
+
+                    for (var item in cart.items) {
+                      final querySnapshot =
+                          await FirebaseFirestore.instance
+                              .collection('items')
+                              .where('name', isEqualTo: item.name)
+                              .get();
+
+                      if (querySnapshot.docs.isNotEmpty) {
+                        final doc = querySnapshot.docs.first;
+                        final stock = doc['stock'];
+
+                        if (stock >= item.quantity) {
+                          hasValidItems = true;
+                          await firebaseService.purchaseProduct(
+                            doc.id,
+                            item.quantity,
+                          );
+                        }
+                      } else if (item.name == 'Membership') {
                         hasValidItems = true;
-                        await firebaseService.purchaseProduct(
-                          doc.id,
-                          item.quantity,
-                        );
-                      }
-                    } else if (item.name == 'Membership') {
-                      hasValidItems = true;
-                      // Update membership status here if needed
-                      await FirebaseFirestore.instance
-                          .collection('user')
-                          .doc(userId)
-                          .update({'membership': true});
-                    }
-                  }
-
-                  if (hasValidItems) {
-                    final userDoc =
                         await FirebaseFirestore.instance
                             .collection('user')
                             .doc(userId)
-                            .get();
-                    final membership = userDoc.data()?['membership'] ?? false;
+                            .update({'membership': true});
+                      }
+                    }
 
-                    await firebaseService.addOrder(
-                      userId: userId,
-                      paid: cart.totalAmount,
-                      items: cart.items,
-                      organization: 'Yayasan Kebajikan Negara (YKN)',
-                      paymentMethod: 'Online',
-                      membership: membership,
-                    );
+                    if (hasValidItems) {
+                      final userDoc =
+                          await FirebaseFirestore.instance
+                              .collection('user')
+                              .doc(userId)
+                              .get();
+                      final membership = userDoc.data()?['membership'] ?? false;
 
-                    cart.clearCart();
+                      await firebaseService.addOrder(
+                        userId: userId,
+                        paid: cart.totalAmount,
+                        items: cart.items,
+                        organization: 'Yayasan Kebajikan Negara (YKN)',
+                        paymentMethod: 'Stripe',
+                        membership: membership,
+                      );
+
+                      cart.clearCart();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Payment successful!")),
+                      );
+                    }
+                  } catch (e) {
+                    print('Stripe Error: $e');
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Purchase successful!")),
+                      const SnackBar(
+                        content: Text("Payment failed or canceled."),
+                      ),
                     );
                   }
                 }
               },
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 padding: const EdgeInsets.symmetric(

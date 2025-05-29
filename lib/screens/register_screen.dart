@@ -43,7 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Registration successful!')));
 
-      Navigator.pushReplacementNamed(context, '/screen1'); // Go back to login
+      Navigator.pushReplacementNamed(context, '/login'); // Go back to login
     } catch (e) {
       // Show error
       ScaffoldMessenger.of(

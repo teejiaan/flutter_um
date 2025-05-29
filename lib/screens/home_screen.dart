@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
               // Custom Buttons with small graphics
               CustomButton(
                 label: 'Login',
-                onPressed: () => Navigator.pushNamed(context, '/screen1'),
+                onPressed: () => Navigator.pushNamed(context, '/login'),
               ),
               // const SizedBox(height: 16),
               // CustomButton(

@@ -107,7 +107,7 @@ class _MainScreenState extends State<MainScreen> {
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushReplacementNamed(
                   context,
-                  '/screen1',
+                  '/login',
                 ); // Redirect to login
               },
             ),

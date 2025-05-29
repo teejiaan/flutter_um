@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/login_register_template.dart';
 import '../services/firebase_service.dart';
@@ -19,14 +21,44 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = passwordController.text.trim();
 
     try {
+      // Sign in the user
       await firebaseService.signIn(email, password);
 
+      // Get the current authenticated user
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception("User not found after login");
+      }
+
+      final userId = user.uid;
+
+      // Fetch the user's Firestore document using UID
+      final userDocSnapshot =
+          await FirebaseFirestore.instance.collection('user').doc(userId).get();
+
+      if (!userDocSnapshot.exists) {
+        throw Exception("No user document found for UID: $userId");
+      }
+
+      final userData = userDocSnapshot.data();
+      print("DEBUG: Full user document = $userData");
+
+      final role = userData?['role'];
+      print("DEBUG: User role is: $role");
+
+      // Show success feedback
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Login successful!')));
 
-      Navigator.pushReplacementNamed(context, '/main');
+      // Redirect based on role
+      if (role == 'manager') {
+        Navigator.pushReplacementNamed(context, '/manager');
+      } else {
+        Navigator.pushReplacementNamed(context, '/main');
+      }
     } catch (e) {
+      print("DEBUG: Login error = $e");
       showDialog(
         context: context,
         builder:
