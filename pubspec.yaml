@@ -27,6 +27,9 @@ dependencies:
   share_plus: ^10.1.4
   flutter_stripe: ^9.5.0
   http: ^0.13.6
+  firebase_storage: ^12.4.6
+  path: ^1.9.1
+  image_picker: ^1.1.2
   
 
 dev_dependencies:
