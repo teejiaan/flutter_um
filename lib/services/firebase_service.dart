@@ -26,7 +26,6 @@ class FirebaseService {
     });
   }
 
-  // Optional: fetch user data later
   Future<DocumentSnapshot> getUserData(String uid) {
     return _db.collection('user').doc(uid).get();
   }
@@ -91,14 +90,13 @@ class FirebaseService {
         'PointsAdded':
             membership
                 ? (paid / 5)
-                    .round() // Example logic to calculate points for members
+                    .round() // Logic to calculate points for members
                 : (paid / 10)
-                    .round(), // Example logic to calculate points for non-members
-        'Time': formattedTime, // Example logic to calculate points
+                    .round(), // Logic to calculate points for non-members
+        'Time': formattedTime,
         'Date': formattedDate,
         'PaymentMethod': paymentMethod,
-        'ReceiptID':
-            'Receipt_${transactionId}', // Example, could be more sophisticated
+        'ReceiptID': 'Receipt_${transactionId}',
       });
 
       print('Order added successfully');

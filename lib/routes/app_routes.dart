@@ -4,6 +4,7 @@ import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/manager_screen.dart';
+import '../screens/account_screen.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
   '/': (context) => const HomeScreen(),
@@ -11,4 +12,6 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/register': (context) => const RegisterScreen(),
   '/main': (context) => const MainScreen(),
   '/manager': (context) => const ManagerScreen(),
+  '/developer':
+      (context) => const AccountScreen(), // Placeholder for developer screen
 };
