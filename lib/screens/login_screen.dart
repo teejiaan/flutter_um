@@ -54,6 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
       // Redirect based on role
       if (role == 'manager') {
         Navigator.pushReplacementNamed(context, '/manager');
+      } else if (role == 'admin') {
+        Navigator.pushReplacementNamed(context, '/admin');
       } else {
         Navigator.pushReplacementNamed(context, '/main');
       }
@@ -73,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/screen2');
+                    Navigator.pushNamed(context, '/register');
                   },
                   child: const Text('Register'),
                 ),

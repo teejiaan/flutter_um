@@ -22,12 +22,6 @@ class HomeScreen extends StatelessWidget {
                 label: 'Login',
                 onPressed: () => Navigator.pushNamed(context, '/login'),
               ),
-              // const SizedBox(height: 16),
-              // CustomButton(
-              //   label: 'Go to Screen 2',
-              //   imagePath: 'assets/orange_back.jpeg',
-              //   onPressed: () => Navigator.pushNamed(context, '/screen2'),
-              // ),
             ],
           ),
         ),

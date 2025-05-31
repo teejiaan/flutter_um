@@ -12,6 +12,6 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/register': (context) => const RegisterScreen(),
   '/main': (context) => const MainScreen(),
   '/manager': (context) => const ManagerScreen(),
-  '/developer':
+  '/admin':
       (context) => const AccountScreen(), // Placeholder for developer screen
 };
