@@ -87,35 +87,52 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LoginRegisterTemplate(
-      title: 'Login to Your Account',
-      submitLabel: 'Login',
-      onSubmit: handleLogin,
-      fields: [
-        TextField(
-          controller: emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            labelText: 'Email',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
+    return Scaffold(
+      body: LoginRegisterTemplate(
+        title: 'Login to Your Account',
+        submitLabel: 'Login',
+        onSubmit: handleLogin,
+        fields: [
+          TextField(
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              labelText: 'Email',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              prefixIcon: Icon(Icons.email),
             ),
-            prefixIcon: Icon(Icons.email),
           ),
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: passwordController,
-          obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'Password',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
+          const SizedBox(height: 16),
+          TextField(
+            controller: passwordController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Password',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              prefixIcon: Icon(Icons.lock),
             ),
-            prefixIcon: Icon(Icons.lock),
           ),
-        ),
-      ],
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed:
+                    () => Navigator.pushNamed(context, '/forgot-password'),
+                child: const Text('Forgot Password?'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pushNamed(context, '/register'),
+                child: const Text('Create Account'),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

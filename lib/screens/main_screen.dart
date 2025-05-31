@@ -62,6 +62,7 @@ class _MainScreenState extends State<MainScreen> {
               title: const Text('Settings'),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/settings');
               },
             ),
             ListTile(

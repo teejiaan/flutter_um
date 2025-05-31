@@ -47,11 +47,7 @@ class ProductCard extends StatelessWidget {
               flex: 2,
               child: Column(
                 children: [
-                  Image.asset(
-                    'assets/$imageUrl',
-                    height: 100,
-                    fit: BoxFit.contain,
-                  ),
+                  Image.network(imageUrl, height: 100, fit: BoxFit.contain),
                   const SizedBox(height: 8),
                   Text(
                     name,

@@ -27,7 +27,7 @@ class CartScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final item = cart.items[index];
                 return ListTile(
-                  leading: Image.asset('assets/${item.imageUrl}', height: 40),
+                  leading: Image.network(item.imageUrl, height: 40),
                   title: Text(item.name),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
